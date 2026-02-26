@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "settings": {
+        "show_vendor": false,
+        "show_sticky_atc": true,
+        "media_size": "large"
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "settings": {
+        "heading": "Customer results"
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "heading": "Product FAQ"
+      }
+    }
+  },
+  "order": ["main", "testimonials", "faq"]
+}

@@ -1,0 +1,51 @@
+<section class="section section-comparison page-width" data-section-id="{{ section.id }}">
+  <h2 class="section__heading">{{ section.settings.heading }}</h2>
+  <div class="comparison-table-wrapper">
+    <table class="comparison-table">
+      <thead>
+        <tr>
+          <th>Feature</th>
+          <th>{{ section.settings.our_label }}</th>
+          <th>{{ section.settings.other_label }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for block in section.blocks %}
+          <tr {{ block.shopify_attributes }}>
+            <th>{{ block.settings.feature }}</th>
+            <td>{{ block.settings.ours }}</td>
+            <td>{{ block.settings.others }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Comparison table",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Why we stand out" },
+    { "type": "text", "id": "our_label", "label": "Our label", "default": "Our Product" },
+    { "type": "text", "id": "other_label", "label": "Other label", "default": "Alternatives" }
+  ],
+  "blocks": [
+    {
+      "type": "row",
+      "name": "Row",
+      "settings": [
+        { "type": "text", "id": "feature", "label": "Feature", "default": "Premium materials" },
+        { "type": "text", "id": "ours", "label": "Our value", "default": "Included" },
+        { "type": "text", "id": "others", "label": "Other value", "default": "Extra cost" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Comparison table",
+      "blocks": [{ "type": "row" }, { "type": "row" }, { "type": "row" }]
+    }
+  ]
+}
+{% endschema %}
