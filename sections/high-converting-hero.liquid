@@ -8,8 +8,9 @@
           class: 'hc-hero__image',
           widths: '375, 550, 750, 1100, 1500, 2000, 2400',
           sizes: '100vw',
-          loading: 'lazy',
+          loading: 'eager',
           decoding: 'async',
+          fetchpriority: 'high',
           alt: section.settings.background_image.alt | default: section.settings.headline
       }}
     {% else %}
