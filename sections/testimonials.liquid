@@ -1,27 +1,291 @@
+{% liquid
+  assign testimonials_count = section.blocks.size
+  assign show_slider = section.settings.layout == 'slider' and testimonials_count > 1
+%}
+
 <section class="section section-testimonials page-width" data-section-id="{{ section.id }}">
-  <h2 class="section__heading">{{ section.settings.heading }}</h2>
-  <div class="testimonials-grid">
-    {% for block in section.blocks %}
-      <article class="testimonial-card" {{ block.shopify_attributes }}>
-        <p class="testimonial-card__rating" aria-label="{{ block.settings.rating }} out of 5 stars">
-          {% for i in (1..block.settings.rating) %}★{% endfor %}
-        </p>
-        <blockquote class="testimonial-card__quote">“{{ block.settings.quote }}”</blockquote>
-        <cite class="testimonial-card__author">{{ block.settings.author }}</cite>
-      </article>
-    {% endfor %}
+  {% if section.settings.heading != blank %}
+    <h2 class="section__heading">{{ section.settings.heading | escape }}</h2>
+  {% endif %}
+
+  <div class="testimonials testimonials--{{ section.settings.layout }}" data-testimonials-root>
+    {% if show_slider %}
+      <div class="testimonials__controls" aria-label="{{ 'general.slider.name' | t | default: 'Testimonial slider controls' }}">
+        <button class="testimonials__nav" type="button" data-testimonial-prev aria-label="Previous testimonials">←</button>
+        <button class="testimonials__nav" type="button" data-testimonial-next aria-label="Next testimonials">→</button>
+      </div>
+    {% endif %}
+
+    <div class="testimonials__track" {% if show_slider %}data-testimonial-track{% endif %}>
+      {% for block in section.blocks %}
+        <article class="testimonial-card" {{ block.shopify_attributes }}>
+          <div class="testimonial-card__meta">
+            {% if block.settings.image != blank %}
+              {{
+                block.settings.image
+                | image_url: width: 160
+                | image_tag:
+                  class: 'testimonial-card__image',
+                  loading: 'lazy',
+                  widths: '60,80,120,160',
+                  sizes: '60px',
+                  alt: block.settings.name
+              }}
+            {% else %}
+              <div class="testimonial-card__image testimonial-card__image--placeholder" aria-hidden="true">{{ block.settings.name | default: '?' | slice: 0 }}</div>
+            {% endif %}
+
+            <div>
+              <p class="testimonial-card__name">{{ block.settings.name | escape }}</p>
+              {% if block.settings.verified %}
+                <p class="testimonial-card__verified" aria-label="Verified customer">
+                  <span class="testimonial-card__badge" aria-hidden="true">✔</span>
+                  {{ section.settings.verified_label | escape }}
+                </p>
+              {% endif %}
+            </div>
+          </div>
+
+          <p class="testimonial-card__stars" aria-label="{{ block.settings.rating }} out of 5 stars">
+            {% for i in (1..5) %}
+              <span aria-hidden="true">{% if i <= block.settings.rating %}★{% else %}☆{% endif %}</span>
+            {% endfor %}
+          </p>
+
+          {% if block.settings.quote != blank %}
+            <blockquote class="testimonial-card__quote">“{{ block.settings.quote | escape }}”</blockquote>
+          {% endif %}
+        </article>
+      {% endfor %}
+    </div>
+
+    {% if show_slider %}
+      <div class="testimonials__dots" data-testimonial-dots></div>
+    {% endif %}
   </div>
 </section>
+
+<style>
+  .section-testimonials .testimonials {
+    position: relative;
+  }
+
+  .section-testimonials .testimonials__track {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .section-testimonials .testimonials--grid .testimonials__track {
+    grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+  }
+
+  .section-testimonials .testimonials--slider .testimonials__track {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(85%, 1fr);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 0.4rem;
+  }
+
+  .section-testimonials .testimonials--slider .testimonials__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .section-testimonials .testimonials--slider .testimonial-card {
+    scroll-snap-align: start;
+  }
+
+  .section-testimonials .testimonials__controls {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+  }
+
+  .section-testimonials .testimonials__nav {
+    width: 3.6rem;
+    height: 3.6rem;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .section-testimonials .testimonial-card {
+    background: #f8f8f8;
+    border-radius: 1.2rem;
+    padding: var(--space-6);
+  }
+
+  .section-testimonials .testimonial-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .section-testimonials .testimonial-card__image {
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .section-testimonials .testimonial-card__image--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ececec;
+    font-weight: 600;
+  }
+
+  .section-testimonials .testimonial-card__name {
+    margin: 0;
+    font-weight: 600;
+  }
+
+  .section-testimonials .testimonial-card__verified {
+    margin: 0.4rem 0 0;
+    font-size: 1.4rem;
+    color: #2d6a4f;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-testimonials .testimonial-card__badge {
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50%;
+    background: #2d6a4f;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+  }
+
+  .section-testimonials .testimonial-card__stars {
+    margin: var(--space-4) 0 var(--space-2);
+    color: #f4a300;
+    letter-spacing: 0.1rem;
+  }
+
+  .section-testimonials .testimonial-card__quote {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  .section-testimonials .testimonials__dots {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+    margin-top: var(--space-4);
+  }
+
+  .section-testimonials .testimonials__dot {
+    width: 0.8rem;
+    height: 0.8rem;
+    border-radius: 50%;
+    border: 0;
+    background: #d0d0d0;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .section-testimonials .testimonials__dot.is-active {
+    background: #111;
+  }
+
+  @media (min-width: 750px) {
+    .section-testimonials .testimonials--slider .testimonials__track {
+      grid-auto-columns: minmax(42%, 1fr);
+    }
+  }
+</style>
+
+{% if show_slider %}
+  <script>
+    (() => {
+      const root = document.currentScript && document.currentScript.closest('[data-section-id="{{ section.id }}"]');
+      if (!root) return;
+
+      const track = root.querySelector('[data-testimonial-track]');
+      const prev = root.querySelector('[data-testimonial-prev]');
+      const next = root.querySelector('[data-testimonial-next]');
+      const dotsWrap = root.querySelector('[data-testimonial-dots]');
+      if (!track || !prev || !next || !dotsWrap) return;
+
+      const cards = Array.from(track.children);
+      const cardCount = cards.length;
+      if (cardCount < 2) return;
+
+      const scrollToCard = (index) => {
+        const clampedIndex = Math.max(0, Math.min(index, cardCount - 1));
+        track.scrollTo({ left: cards[clampedIndex].offsetLeft, behavior: 'smooth' });
+      };
+
+      const dots = cards.map((_, index) => {
+        const dot = document.createElement('button');
+        dot.className = 'testimonials__dot';
+        dot.type = 'button';
+        dot.ariaLabel = `Go to testimonial ${index + 1}`;
+        dot.addEventListener('click', () => scrollToCard(index));
+        dotsWrap.appendChild(dot);
+        return dot;
+      });
+
+      const getActiveIndex = () => {
+        const midpoint = track.scrollLeft + track.offsetWidth / 2;
+        let activeIndex = 0;
+        cards.forEach((card, index) => {
+          if (card.offsetLeft <= midpoint) activeIndex = index;
+        });
+        return activeIndex;
+      };
+
+      const setActiveDot = () => {
+        const activeIndex = getActiveIndex();
+        dots.forEach((dot, index) => dot.classList.toggle('is-active', index === activeIndex));
+      };
+
+      prev.addEventListener('click', () => scrollToCard(getActiveIndex() - 1));
+      next.addEventListener('click', () => scrollToCard(getActiveIndex() + 1));
+      track.addEventListener('scroll', () => window.requestAnimationFrame(setActiveDot), { passive: true });
+
+      setActiveDot();
+    })();
+  </script>
+{% endif %}
 
 {% schema %}
 {
   "name": "Testimonials",
+  "tag": "section",
+  "class": "section-testimonials-wrapper",
   "settings": [
     {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "What customers are saying"
+      "default": "Trusted by happy customers"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "default": "slider",
+      "options": [
+        { "value": "slider", "label": "Slider" },
+        { "value": "grid", "label": "Grid" }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "verified_label",
+      "label": "Verified badge label",
+      "default": "Verified buyer"
     }
   ],
   "blocks": [
@@ -29,17 +293,50 @@
       "type": "testimonial",
       "name": "Testimonial",
       "settings": [
-        { "type": "textarea", "id": "quote", "label": "Quote", "default": "This product is amazing." },
-        { "type": "text", "id": "author", "label": "Author", "default": "Verified buyer" },
-        { "type": "range", "id": "rating", "label": "Rating", "min": 1, "max": 5, "step": 1, "default": 5 }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Customer image"
+        },
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Customer name",
+          "default": "Sarah M."
+        },
+        {
+          "type": "checkbox",
+          "id": "verified",
+          "label": "Show verified badge",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "label": "Star rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        },
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "This is the best purchase I made this year."
+        }
       ]
     }
   ],
-  "max_blocks": 6,
+  "max_blocks": 12,
   "presets": [
     {
       "name": "Testimonials",
-      "blocks": [{ "type": "testimonial" }, { "type": "testimonial" }]
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
     }
   ]
 }
