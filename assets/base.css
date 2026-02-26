@@ -32,7 +32,11 @@ h2 { font-size: clamp(2.4rem, 6vw, 4rem); }
   margin-inline: auto;
 }
 
-.section { padding: var(--space-12) 0; }
+.section {
+  padding: var(--space-12) 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 900px;
+}
 .section__heading { margin-bottom: var(--space-6); }
 
 .button {
