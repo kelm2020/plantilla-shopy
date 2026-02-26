@@ -1,0 +1,56 @@
+{
+  "sections": {
+    "hero": {
+      "type": "main-product",
+      "settings": {
+        "show_vendor": false,
+        "show_sticky_atc": true,
+        "media_size": "large"
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "review_1": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "This product solved my biggest pain point in one day.",
+            "author": "Alex, Verified Buyer",
+            "rating": 5
+          }
+        },
+        "review_2": {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Beautiful quality and fast shipping. Highly recommend.",
+            "author": "Taylor, Verified Buyer",
+            "rating": 5
+          }
+        }
+      },
+      "block_order": ["review_1", "review_2"],
+      "settings": {
+        "heading": "Loved by customers"
+      }
+    },
+    "comparison": {
+      "type": "comparison-table",
+      "settings": {
+        "heading": "Why choose us"
+      }
+    },
+    "before_after": {
+      "type": "before-after",
+      "settings": {
+        "heading": "See the difference"
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "settings": {
+        "heading": "Frequently asked questions"
+      }
+    }
+  },
+  "order": ["hero", "testimonials", "comparison", "before_after", "faq"]
+}

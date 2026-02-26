@@ -1,0 +1,26 @@
+.sticky-atc {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  padding: 1.2rem 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid #eaeaea;
+  transform: translateY(110%);
+  transition: transform 220ms ease;
+  z-index: 20;
+}
+
+.sticky-atc.is-visible { transform: translateY(0); }
+
+.sticky-atc__content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.6rem;
+}
+
+.sticky-atc__title,
+.sticky-atc__price { margin: 0; }
+.sticky-atc__title { font-weight: 600; font-size: 1.6rem; }
+.sticky-atc__price { color: #444; font-size: 1.4rem; }

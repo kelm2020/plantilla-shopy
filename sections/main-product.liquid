@@ -1,0 +1,109 @@
+{% liquid
+  assign featured_media = product.selected_or_first_available_variant.featured_media | default: product.featured_media
+%}
+
+<section class="section section-main-product" data-section-id="{{ section.id }}">
+  <div class="page-width product product--{{ section.settings.media_size }}">
+    <div class="product__media-wrapper">
+      {% if featured_media %}
+        {{ featured_media | image_url: width: 1400 | image_tag: loading: 'eager', class: 'product__media', widths: '375, 550, 750, 1100, 1400' }}
+      {% endif %}
+    </div>
+
+    <div class="product__info-wrapper">
+      {% if section.settings.show_vendor and product.vendor != blank %}
+        <p class="product__vendor">{{ product.vendor }}</p>
+      {% endif %}
+
+      <h1 class="product__title">{{ product.title }}</h1>
+      <p class="product__price" id="price-{{ section.id }}">{{ product.selected_or_first_available_variant.price | money }}</p>
+
+      {% if product.description != blank %}
+        <div class="product__description rte">{{ product.description }}</div>
+      {% endif %}
+
+      {% form 'product', product, id: 'product-form-' | append: section.id, class: 'product-form' %}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+        {% if product.has_only_default_variant == false %}
+          {% for option in product.options_with_values %}
+            <label class="product-form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">{{ option.name }}</label>
+            <select class="product-form__select" id="Option-{{ section.id }}-{{ forloop.index0 }}" name="options[{{ option.name | escape }}]">
+              {% for value in option.values %}
+                <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>{{ value }}</option>
+              {% endfor %}
+            </select>
+          {% endfor %}
+        {% endif %}
+
+        <button
+          type="submit"
+          name="add"
+          class="button button--primary product-form__submit"
+          {% unless product.selected_or_first_available_variant.available %}disabled{% endunless %}
+        >
+          {% if product.selected_or_first_available_variant.available %}
+            {{ 'products.product.add_to_cart' | t }}
+          {% else %}
+            {{ 'products.product.sold_out' | t }}
+          {% endif %}
+        </button>
+      {% endform %}
+    </div>
+  </div>
+
+  {% if section.settings.show_sticky_atc %}
+    <aside class="sticky-atc" data-sticky-atc>
+      <div class="sticky-atc__content page-width">
+        <div>
+          <p class="sticky-atc__title">{{ product.title }}</p>
+          <p class="sticky-atc__price">{{ product.selected_or_first_available_variant.price | money }}</p>
+        </div>
+        <button class="button button--primary" type="button" data-sticky-atc-trigger>
+          {{ 'products.product.add_to_cart' | t }}
+        </button>
+      </div>
+    </aside>
+  {% endif %}
+</section>
+
+{% if section.settings.show_sticky_atc %}
+  <script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+  <script src="{{ 'sticky-atc.js' | asset_url }}" defer="defer"></script>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Main product",
+  "tag": "section",
+  "class": "section",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "Show vendor",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "media_size",
+      "label": "Media size",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" }
+      ],
+      "default": "large"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sticky_atc",
+      "label": "Enable sticky add to cart",
+      "default": true
+    }
+  ],
+  "presets": [
+    { "name": "Main product" }
+  ]
+}
+{% endschema %}
